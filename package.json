@@ -1,0 +1,39 @@
+{
+  "name": "aura-build",
+  "version": "1.0.0",
+  "description": "node build setup for aura bundles",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bvellacott/aura-build.git"
+  },
+  "keywords": [
+    "salesforce",
+    "lightning",
+    "aura",
+    "build",
+    "setup",
+    "broccoli",
+    "deploy"
+  ],
+  "author": "Benjamin Vellacott",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/bvellacott/aura-build/issues"
+  },
+  "homepage": "https://github.com/bvellacott/aura-build#readme",
+  "devDependencies": {
+    "broccoli-browser-sync": "^1.0.1",
+    "broccoli-concat": "^3.1.1",
+    "broccoli-fs": "0.0.1",
+    "broccoli-funnel": "^1.1.0",
+    "broccoli-merge-trees": "^1.2.1",
+    "broccoli-stew": "^1.4.0",
+    "http-proxy-middleware": "^0.17.3",
+    "jsforce": "^1.7.1",
+    "qunitjs": "^2.1.1"
+  }
+}
