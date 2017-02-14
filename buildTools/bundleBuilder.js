@@ -49,7 +49,7 @@ function build(bundlesDir, bundleName, node_modules, options) {
 	const helperName = bundleName + 'Helper.js.';
 	const rendererName = bundleName + 'Renderer.js';
 
-	var allNodes = [ testsStatic, staticFilesPath];
+	var allNodes = [testsStatic, staticFilesPath];
  	var staticresourceNodes = [staticFilesPath];
 
 	// component
@@ -75,11 +75,6 @@ function build(bundlesDir, bundleName, node_modules, options) {
 	  password: sfCreds.password,
 	  securityToken: sfCreds.securityToken
  	};
-
-	var bundle = deploy(bundlePath, Object.assign({}, deploymentDefaults, {
-		skipFirstBuild: false,
- 	  type: 'AuraDefinitionBundle'
-	}));
 
 	var app = deploy(pickFiles(bundlePath, { include: [ appName ] }), 
 		Object.assign({}, deploymentDefaults, { 
@@ -115,7 +110,7 @@ function build(bundlesDir, bundleName, node_modules, options) {
 		defType: 'SVG',
 		format: 'SVG' 
 	}));
- 	allNodes = allNodes.concat([ bundle, app, auradoc, component, design, svg ]);
+ 	allNodes = allNodes.concat([ app, auradoc, component, design, svg ]);
 
  	var testableController = concat(path.join(bundlePath, controllerName), {
 	  outputFile: controllerName + '.hintable',
