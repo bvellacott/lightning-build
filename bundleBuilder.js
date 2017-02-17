@@ -16,11 +16,11 @@ const debug = require('broccoli-stew').debug;
 const replace = require('broccoli-replace');
 const zip = require('broccoli-zip-js');
 const deploy = require('broccoli-salesforce-deploy');
-deploy.setLogLevel('info'); // none, info or error
+deploy.setLogLevel('error'); // none, info or error
 
-const toolOptions = require('./toolOptions');
+const toolOptions = require('./buildTools/toolOptions');
 
-const sfCreds = require('../sfCredentials.json');
+const sfCreds = require('./sfCredentials.json');
 
 const testsStatic = pickFiles('./shared', {
   include: ['tests.html'],
@@ -46,7 +46,7 @@ function build(bundlesDir, bundleName, node_modules, options) {
 	const designName = bundleName + '.design';
 	const svgName = bundleName + '.svg';
 	const controllerName = bundleName + 'Controller.js'
-	const helperName = bundleName + 'Helper.js';
+	const helperName = bundleName + 'Helper.js.';
 	const rendererName = bundleName + 'Renderer.js';
 
 	var allNodes = [testsStatic];
@@ -142,7 +142,6 @@ function build(bundlesDir, bundleName, node_modules, options) {
 	  allowNone: true
 	});
 	var hintables = mergeNodes([
-		pickFiles('.', { include: [ '.jshintrc' ] }),
 		jsPath,
 	 	testableController,
 	 	testableHelper,
@@ -162,28 +161,28 @@ function build(bundlesDir, bundleName, node_modules, options) {
 	);
   allNodes.push(jshintTests);
 
-	var tool = es6Transpile(tool, { blacklist: ["useStrict"] });
-	var helper = mergeNodes([tool, node_modules]);
+	var transpiledTool = es6Transpile(tool);
+	var helper = mergeNodes([transpiledTool, node_modules]);
 
-	// helper = watchify(helper, toolOptions.watchifyOptions(helperName, helperName, isProduction));
-	// tool = mergeNodes([tool, helper], { overwrite: true });
+	helper = watchify(helper, toolOptions.watchifyOptions(helperName, helperName, isProduction));
+	tool = mergeNodes([tool, helper], { overwrite: true });
 	if(isProduction) {
 		tool = uglify(tool, toolOptions.uglify(isProduction));
 	}
   
-	var controller = deploy(pickFiles(tool, { include: [ controllerName ] }), 
+	var controller = deploy(bundlePath, 
 		Object.assign({}, deploymentDefaults, { 
 		file: controllerName,
 		defType: 'CONTROLLER',
 		format: 'JS' 
 	}));
-	var helper = deploy(pickFiles(tool, { include: [ helperName ] }), 
+	var helper = deploy(pickFiles(bundlePath, { include: [ helperName ] }), 
 		Object.assign({}, deploymentDefaults, { 
 		file: helperName,
 		defType: 'HELPER',
 		format: 'JS' 
 	}));
-	var renderer = deploy(pickFiles(tool, { include: [ rendererName ] }), 
+	var renderer = deploy(pickFiles(bundlePath, { include: [ rendererName ] }), 
 		Object.assign({}, deploymentDefaults, { 
 		file: rendererName,
 		defType: 'RENDERER',
@@ -192,7 +191,7 @@ function build(bundlesDir, bundleName, node_modules, options) {
  	allNodes = allNodes.concat([ controller, helper, renderer ]);
 
 	//style
-	var style = sassCompile([pickFiles(bundlePath, { include: ['**/*.sass', '**/*.scss'] })], styleName, bundleName + '.css', toolOptions.sassCompileOptions(bundleName, isProduction));
+	var style = sassCompile([bundlePath], styleName, bundleName + '.css', toolOptions.sassCompileOptions(bundleName, isProduction));
 	style = deploy(style, 
 		Object.assign({}, deploymentDefaults, { 
 		file: bundleName + '.css',

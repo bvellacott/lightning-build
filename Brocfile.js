@@ -5,15 +5,17 @@ const concat = require('broccoli-concat');
 const fs = require('fs');
 const path = require('path');
 
-const BrowserSync = require('broccoli-browser-sync');
+const BrowserSync = require('broccoli-browser-sync-bv');
 const proxy = require('http-proxy-middleware');
 
-const buldBundle = require('./buildTools/bundleBuilder');
+const buildBundle = require('./buildTools/bundleBuilder');
 
 const isProduction = process.env.BROCCOLI_ENV === 'production';
 var allNodes = [];
 
-const bundlesDir = './resource-bundles/aura';
+const bundlesDir = './aura';
+
+var node_modules = './browserified_modules';
 
 var bundleNodes = [];
 var bundleDirectories = fs.readdirSync(bundlesDir).filter(function(file) {
@@ -22,7 +24,7 @@ var bundleDirectories = fs.readdirSync(bundlesDir).filter(function(file) {
 
 bundleDirectories.forEach(function(bundleDir) {
 	var bundleName = path.basename(bundleDir);
-	var bundleNode = buldBundle(bundlesDir, bundleName, node_modules, getbundleBuildOptions(bundleName));
+	var bundleNode = buildBundle(bundlesDir, bundleName, node_modules, { debugResult: true, isProduction: isProduction });
 	bundleNodes.push(bundleNode);
 });
 
